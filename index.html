@@ -35,7 +35,7 @@
             background: #ddd;
         }
         .container {
-            margin-top: 60px; /* Adjust for navbar */
+            margin-top: 60px;
             padding: 20px;
             text-align: center;
         }
@@ -43,6 +43,15 @@
         .page {
             padding: 20px;
         }
+        .log {
+            border: 3px solid red;
+            background: white;
+            padding: 10px;
+            margin: 10px;
+            border-radius: 5px;
+        }
+        .log.assigned { border-color: orange; }
+        .log.resolved { border-color: green; }
     </style>
 </head>
 <body>
@@ -73,6 +82,7 @@
 
         <div id="logs" class="page hidden">
             <h2>Logs</h2>
+            <div id="log-list"></div>
         </div>
 
         <div id="create-log" class="page hidden">
@@ -85,7 +95,8 @@
 
         <div id="support" class="page hidden">
             <h2>Support</h2>
-            <p><strong>Email:</strong> tickets@cyberfusion-0o9vqc.p.tawk.email</p>
+            <p><strong>Email:</strong> support@yourcompany.com</p>
+            <p><strong>Live Chat:</strong> <a href="#">Click Here</a></p>
             <h3>FAQs</h3>
             <p><strong>Q:</strong> How do I create a log?<br>
                <strong>A:</strong> Click "Create Log" and fill in the details.</p>
@@ -110,6 +121,7 @@
             document.getElementById("dashboard").classList.remove("hidden");
             document.getElementById("nav-bar").classList.remove("hidden");
             document.getElementById("user-info").innerText = `${username} - ${position}`;
+            loadLogs();
         }
 
         function logout() {
@@ -122,6 +134,68 @@
             document.getElementById(page).classList.remove("hidden");
         }
 
+        function submitLog() {
+            let name = document.getElementById("logName").value;
+            let reason = document.getElementById("logReason").value;
+            let description = document.getElementById("logDescription").value;
+
+            if (!name || !reason || !description) {
+                alert("All fields are required!");
+                return;
+            }
+
+            let logs = JSON.parse(localStorage.getItem("logs") || "[]");
+            logs.push({ name, reason, description, status: "unassigned", assignedTo: "", resolvedBy: "" });
+            localStorage.setItem("logs", JSON.stringify(logs));
+
+            document.getElementById("logName").value = "";
+            document.getElementById("logReason").value = "";
+            document.getElementById("logDescription").value = "";
+
+            loadLogs();
+            showPage("logs");
+        }
+
+        function loadLogs() {
+            let logs = JSON.parse(localStorage.getItem("logs") || "[]");
+            let logList = document.getElementById("log-list");
+            logList.innerHTML = "";
+
+            logs.forEach((log, index) => {
+                let logDiv = document.createElement("div");
+                logDiv.className = "log " + (log.status === "assigned" ? "assigned" : log.status === "resolved" ? "resolved" : "");
+                logDiv.innerHTML = `
+                    <h3>${log.name}</h3>
+                    <p><strong>Reason:</strong> ${log.reason}</p>
+                    <p><strong>Description:</strong> ${log.description}</p>
+                    <p><strong>Status:</strong> ${log.status === "unassigned" ? "Awaiting Resolution" :
+                        log.status === "assigned" ? `Claimed by ${log.assignedTo}` :
+                        `Resolved by ${log.resolvedBy}`}</p>
+                    ${log.status === "unassigned" ? `<button onclick="assignLog(${index})">Assign</button>` : ""}
+                    ${log.status === "assigned" ? `<button onclick="resolveLog(${index})">Resolve</button>` : ""}
+                `;
+                logList.appendChild(logDiv);
+            });
+        }
+
+        function assignLog(index) {
+            let user = JSON.parse(localStorage.getItem("loggedUser"));
+            let logs = JSON.parse(localStorage.getItem("logs"));
+            logs[index].status = "assigned";
+            logs[index].assignedTo = `${user.username} - ${user.position}`;
+            localStorage.setItem("logs", JSON.stringify(logs));
+            loadLogs();
+        }
+
+        function resolveLog(index) {
+            let user = JSON.parse(localStorage.getItem("loggedUser"));
+            let logs = JSON.parse(localStorage.getItem("logs"));
+            logs[index].status = "resolved";
+            logs[index].resolvedBy = `${user.username} - ${user.position}`;
+            localStorage.setItem("logs", JSON.stringify(logs));
+            loadLogs();
+        }
+
         (function autoLogin() {
             let user = JSON.parse(localStorage.getItem("loggedUser"));
             if (user) {
@@ -129,6 +203,7 @@
                 document.getElementById("dashboard").classList.remove("hidden");
                 document.getElementById("nav-bar").classList.remove("hidden");
                 document.getElementById("user-info").innerText = `${user.username} - ${user.position}`;
+                loadLogs();
             }
         })();
     </script>
