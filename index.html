@@ -5,171 +5,146 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Management Information System</title>
     <style>
-        body { font-family: Arial, sans-serif; margin: 0; padding: 0; text-align: center; }
-        .container { max-width: 600px; margin: auto; padding: 20px; }
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+            transition: background 0.3s, color 0.3s;
+        }
+        .container {
+            width: 50%;
+            margin: auto;
+            background: white;
+            padding: 20px;
+            text-align: center;
+            border-radius: 10px;
+            box-shadow: 0px 0px 10px rgba(0,0,0,0.2);
+            margin-top: 50px;
+        }
+        input, select, textarea {
+            display: block;
+            width: 90%;
+            margin: 10px auto;
+            padding: 10px;
+        }
+        button {
+            padding: 10px;
+            width: 95%;
+            background: #007bff;
+            color: white;
+            border: none;
+            cursor: pointer;
+            margin-top: 10px;
+        }
         .hidden { display: none; }
-        .nav { background: #222; color: white; padding: 10px; }
-        .nav button { margin: 5px; padding: 10px; }
-        .log { padding: 10px; margin: 10px; border: 2px solid red; background: #f8d7da; }
-        .log.assigned { border-color: orange; background: #fff3cd; }
-        .log.resolved { border-color: green; background: #d4edda; }
-        .profile { position: absolute; top: 10px; right: 10px; background: #ddd; border-radius: 50%; width: 40px; height: 40px; text-align: center; cursor: pointer; }
+        .dashboard {
+            padding: 20px;
+        }
+        .nav {
+            display: flex;
+            justify-content: space-between;
+            background: #007bff;
+            padding: 10px;
+            color: white;
+        }
+        .nav button { margin: 0 5px; }
+        .page { padding: 20px; }
     </style>
 </head>
 <body>
-
-    <!-- Profile Dropdown -->
-    <div class="profile" onclick="toggleProfile()">👤</div>
-    <div id="profileInfo" class="hidden"></div>
-
     <!-- Login Page -->
-    <div id="loginPage" class="container">
-        <h2>Login</h2>
-        <input type="text" id="username" placeholder="Username"><br><br>
-        <input type="text" id="position" placeholder="Position (e.g., Principal, CEO)"><br><br>
-        <input type="password" id="password" placeholder="Password"><br><br>
-        <button onclick="login()">Login</button>
-        <button onclick="signup()">Sign Up</button>
+    <div class="container" id="login-container">
+        <h2>Login / Sign Up</h2>
+        <input type="text" id="username" placeholder="Username">
+        <input type="text" id="position" placeholder="Position">
+        <input type="password" id="password" placeholder="Password">
+        <button onclick="login()">Login / Sign Up</button>
     </div>
 
     <!-- Dashboard -->
-    <div id="dashboard" class="hidden">
+    <div class="dashboard hidden" id="dashboard">
         <div class="nav">
-            <button onclick="showSection('home')">Home</button>
-            <button onclick="showSection('logs')">Logs</button>
-            <button onclick="showSection('createLog')">Create Log</button>
-            <button onclick="logout()">Logout</button>
+            <div>
+                <button onclick="showPage('home')">Home</button>
+                <button onclick="showPage('logs')">Logs</button>
+                <button onclick="showPage('create-log')">Create Log</button>
+                <button onclick="showPage('support')">Support</button>
+                <button onclick="logout()">Logout</button>
+            </div>
+            <div>
+                <span id="user-info"></span>
+            </div>
         </div>
 
-        <div id="home" class="container">
-            <h2>Welcome to the MIS Dashboard</h2>
-            <p>Use the navigation above to manage logs.</p>
+        <!-- Home Page -->
+        <div id="home" class="page">
+            <h2>Welcome to the Management System</h2>
         </div>
 
-        <div id="logs" class="container hidden">
+        <!-- Logs Page -->
+        <div id="logs" class="page hidden">
             <h2>Logs</h2>
-            <div id="logList"></div>
         </div>
 
-        <div id="createLog" class="container hidden">
-            <h2>Create Log</h2>
-            <input type="text" id="logName" placeholder="Name"><br><br>
-            <input type="text" id="logReason" placeholder="Reason"><br><br>
-            <textarea id="logDescription" placeholder="Description"></textarea><br><br>
+        <!-- Create Log Page -->
+        <div id="create-log" class="page hidden">
+            <h2>Create a Log</h2>
+            <input type="text" id="logName" placeholder="Log Name">
+            <input type="text" id="logReason" placeholder="Reason">
+            <textarea id="logDescription" placeholder="Description"></textarea>
             <button onclick="submitLog()">Submit Log</button>
+        </div>
+
+        <!-- Support Page -->
+        <div id="support" class="page hidden">
+            <h2>Support</h2>
+            <p>If you need help, contact our support team.</p>
+            <p><strong>Email:</strong> support@yourcompany.com</p>
+            <p><strong>Live Chat:</strong> <a href="#">Click Here</a></p>
+            <h3>FAQs</h3>
+            <p><strong>Q:</strong> How do I create a log?<br>
+               <strong>A:</strong> Click "Create Log" and fill in the details.</p>
+            <p><strong>Q:</strong> How do I assign a log?<br>
+               <strong>A:</strong> Click "Assign" on the log entry.</p>
         </div>
     </div>
 
-<script>
-    document.addEventListener("DOMContentLoaded", function () {
-        if (!localStorage.getItem("loggedInUser")) {
-            showLoginPage();
-        } else {
-            showDashboard();
+    <script>
+        function login() {
+            let username = document.getElementById("username").value;
+            let position = document.getElementById("position").value;
+            let password = document.getElementById("password").value;
+
+            if (!username || !position || !password) {
+                alert("All fields are required!");
+                return;
+            }
+
+            localStorage.setItem("loggedUser", JSON.stringify({ username, position }));
+            document.getElementById("login-container").classList.add("hidden");
+            document.getElementById("dashboard").classList.remove("hidden");
+            document.getElementById("user-info").innerText = `${username} - ${position}`;
         }
-    });
 
-    function showLoginPage() {
-        document.getElementById("loginPage").classList.remove("hidden");
-        document.getElementById("dashboard").classList.add("hidden");
-    }
-
-    function showDashboard() {
-        document.getElementById("loginPage").classList.add("hidden");
-        document.getElementById("dashboard").classList.remove("hidden");
-        showSection('home');
-        loadLogs();
-    }
-
-    function showSection(section) {
-        document.getElementById("home").classList.add("hidden");
-        document.getElementById("logs").classList.add("hidden");
-        document.getElementById("createLog").classList.add("hidden");
-        document.getElementById(section).classList.remove("hidden");
-    }
-
-    function login() {
-        let username = document.getElementById("username").value;
-        let position = document.getElementById("position").value;
-        let password = document.getElementById("password").value;
-
-        let users = JSON.parse(localStorage.getItem("users") || "[]");
-        let user = users.find(u => u.username === username && u.password === password);
-
-        if (user) {
-            localStorage.setItem("loggedInUser", JSON.stringify({ username, position }));
-            showDashboard();
-        } else {
-            alert("Invalid login credentials.");
+        function logout() {
+            localStorage.removeItem("loggedUser");
+            location.reload();
         }
-    }
 
-    function signup() {
-        let username = document.getElementById("username").value;
-        let position = document.getElementById("position").value;
-        let password = document.getElementById("password").value;
+        function showPage(page) {
+            document.querySelectorAll(".page").forEach(p => p.classList.add("hidden"));
+            document.getElementById(page).classList.remove("hidden");
+        }
 
-        let users = JSON.parse(localStorage.getItem("users") || "[]");
-        users.push({ username, position, password });
-        localStorage.setItem("users", JSON.stringify(users));
-
-        alert("Account created! Please log in.");
-    }
-
-    function logout() {
-        localStorage.removeItem("loggedInUser");
-        showLoginPage();
-    }
-
-    function submitLog() {
-        let logName = document.getElementById("logName").value;
-        let logReason = document.getElementById("logReason").value;
-        let logDescription = document.getElementById("logDescription").value;
-
-        let logs = JSON.parse(localStorage.getItem("logs") || "[]");
-        logs.push({ logName, logReason, logDescription, status: "Awaiting Resolution", assignedTo: null });
-        localStorage.setItem("logs", JSON.stringify(logs));
-
-        document.getElementById("logName").value = "";
-        document.getElementById("logReason").value = "";
-        document.getElementById("logDescription").value = "";
-
-        loadLogs();
-        showSection("logs");
-    }
-
-    function loadLogs() {
-        let logs = JSON.parse(localStorage.getItem("logs") || "[]");
-        let logList = document.getElementById("logList");
-        logList.innerHTML = "";
-
-        logs.forEach((log, index) => {
-            let div = document.createElement("div");
-            div.className = "log " + (log.status.includes("Resolved") ? "resolved" : log.status.includes("Claimed") ? "assigned" : "");
-            div.innerHTML = `<strong>${log.logName}</strong><br>${log.logReason}<br>${log.logDescription}<br>Status: ${log.status}
-                <br><button onclick="assignLog(${index})">Assign</button>
-                <button onclick="resolveLog(${index})">Resolve</button>`;
-            logList.appendChild(div);
-        });
-    }
-
-    function assignLog(index) {
-        let logs = JSON.parse(localStorage.getItem("logs") || "[]");
-        let user = JSON.parse(localStorage.getItem("loggedInUser"));
-        logs[index].status = `Claimed by ${user.username} - ${user.position}`;
-        localStorage.setItem("logs", JSON.stringify(logs));
-        loadLogs();
-    }
-
-    function resolveLog(index) {
-        let logs = JSON.parse(localStorage.getItem("logs") || "[]");
-        let user = JSON.parse(localStorage.getItem("loggedInUser"));
-        logs[index].status = `Resolved by ${user.username} - ${user.position}`;
-        localStorage.setItem("logs", JSON.stringify(logs));
-        loadLogs();
-    }
-
-</script>
-
+        (function autoLogin() {
+            let user = JSON.parse(localStorage.getItem("loggedUser"));
+            if (user) {
+                document.getElementById("login-container").classList.add("hidden");
+                document.getElementById("dashboard").classList.remove("hidden");
+                document.getElementById("user-info").innerText = `${user.username} - ${user.position}`;
+            }
+        })();
+    </script>
 </body>
 </html>
