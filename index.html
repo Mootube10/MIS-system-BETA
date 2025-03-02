@@ -10,49 +10,52 @@
             margin: 0;
             padding: 0;
             background-color: #f4f4f4;
-            transition: background 0.3s, color 0.3s;
-        }
-        .container {
-            width: 50%;
-            margin: auto;
-            background: white;
-            padding: 20px;
-            text-align: center;
-            border-radius: 10px;
-            box-shadow: 0px 0px 10px rgba(0,0,0,0.2);
-            margin-top: 50px;
-        }
-        input, select, textarea {
-            display: block;
-            width: 90%;
-            margin: 10px auto;
-            padding: 10px;
-        }
-        button {
-            padding: 10px;
-            width: 95%;
-            background: #007bff;
-            color: white;
-            border: none;
-            cursor: pointer;
-            margin-top: 10px;
-        }
-        .hidden { display: none; }
-        .dashboard {
-            padding: 20px;
         }
         .nav {
             display: flex;
-            justify-content: space-between;
+            justify-content: center;
             background: #007bff;
             padding: 10px;
-            color: white;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            left: 0;
+            z-index: 1000;
         }
-        .nav button { margin: 0 5px; }
-        .page { padding: 20px; }
+        .nav button {
+            margin: 0 10px;
+            padding: 10px 15px;
+            background: white;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+            border-radius: 5px;
+        }
+        .nav button:hover {
+            background: #ddd;
+        }
+        .container {
+            margin-top: 60px; /* Adjust for navbar */
+            padding: 20px;
+            text-align: center;
+        }
+        .hidden { display: none; }
+        .page {
+            padding: 20px;
+        }
     </style>
 </head>
 <body>
+    <!-- Navigation Bar -->
+    <div class="nav hidden" id="nav-bar">
+        <button onclick="showPage('home')">Home</button>
+        <button onclick="showPage('logs')">Logs</button>
+        <button onclick="showPage('create-log')">Create Log</button>
+        <button onclick="showPage('support')">Support</button>
+        <button onclick="logout()">Logout</button>
+        <span id="user-info" style="color: white; margin-left: 20px;"></span>
+    </div>
+
     <!-- Login Page -->
     <div class="container" id="login-container">
         <h2>Login / Sign Up</h2>
@@ -62,32 +65,16 @@
         <button onclick="login()">Login / Sign Up</button>
     </div>
 
-    <!-- Dashboard -->
-    <div class="dashboard hidden" id="dashboard">
-        <div class="nav">
-            <div>
-                <button onclick="showPage('home')">Home</button>
-                <button onclick="showPage('logs')">Logs</button>
-                <button onclick="showPage('create-log')">Create Log</button>
-                <button onclick="showPage('support')">Support</button>
-                <button onclick="logout()">Logout</button>
-            </div>
-            <div>
-                <span id="user-info"></span>
-            </div>
-        </div>
-
-        <!-- Home Page -->
+    <!-- Pages -->
+    <div class="container hidden" id="dashboard">
         <div id="home" class="page">
             <h2>Welcome to the Management System</h2>
         </div>
 
-        <!-- Logs Page -->
         <div id="logs" class="page hidden">
             <h2>Logs</h2>
         </div>
 
-        <!-- Create Log Page -->
         <div id="create-log" class="page hidden">
             <h2>Create a Log</h2>
             <input type="text" id="logName" placeholder="Log Name">
@@ -96,17 +83,13 @@
             <button onclick="submitLog()">Submit Log</button>
         </div>
 
-        <!-- Support Page -->
         <div id="support" class="page hidden">
             <h2>Support</h2>
-            <p>If you need help, contact our support team.</p>
             <p><strong>Email:</strong> support@yourcompany.com</p>
             <p><strong>Live Chat:</strong> <a href="#">Click Here</a></p>
             <h3>FAQs</h3>
             <p><strong>Q:</strong> How do I create a log?<br>
                <strong>A:</strong> Click "Create Log" and fill in the details.</p>
-            <p><strong>Q:</strong> How do I assign a log?<br>
-               <strong>A:</strong> Click "Assign" on the log entry.</p>
         </div>
     </div>
 
@@ -124,6 +107,7 @@
             localStorage.setItem("loggedUser", JSON.stringify({ username, position }));
             document.getElementById("login-container").classList.add("hidden");
             document.getElementById("dashboard").classList.remove("hidden");
+            document.getElementById("nav-bar").classList.remove("hidden");
             document.getElementById("user-info").innerText = `${username} - ${position}`;
         }
 
@@ -142,6 +126,7 @@
             if (user) {
                 document.getElementById("login-container").classList.add("hidden");
                 document.getElementById("dashboard").classList.remove("hidden");
+                document.getElementById("nav-bar").classList.remove("hidden");
                 document.getElementById("user-info").innerText = `${user.username} - ${user.position}`;
             }
         })();
