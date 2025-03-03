@@ -87,7 +87,9 @@
 
         <div id="create-log" class="page hidden">
             <h2>Create a Log</h2>
-            <input type="text" id="logName" placeholder="Name">
+            <p><strong>Staff Member:</strong> <span id="logUser"></span></p>
+            <p><strong>Position:</strong> <span id="logPosition"></span></p>
+            <input type="text" id="logName" placeholder="Log Name">
             <input type="text" id="logReason" placeholder="Reason">
             <textarea id="logDescription" placeholder="Description"></textarea>
             <button onclick="submitLog()">Submit Log</button>
@@ -95,7 +97,8 @@
 
         <div id="support" class="page hidden">
             <h2>Support</h2>
-            <p><strong>Email:</strong> tickets@cyberfusion-2fzgli.p.tawk.email</p>
+            <p><strong>Email:</strong> support@yourcompany.com</p>
+            <p><strong>Live Chat:</strong> <a href="#">Click Here</a></p>
             <h3>FAQs</h3>
             <p><strong>Q:</strong> How do I create a log?<br>
                <strong>A:</strong> Click "Create Log" and fill in the details.</p>
@@ -120,6 +123,8 @@
             document.getElementById("dashboard").classList.remove("hidden");
             document.getElementById("nav-bar").classList.remove("hidden");
             document.getElementById("user-info").innerText = `${username} - ${position}`;
+            document.getElementById("logUser").innerText = username;
+            document.getElementById("logPosition").innerText = position;
             loadLogs();
         }
 
@@ -137,6 +142,7 @@
             let name = document.getElementById("logName").value;
             let reason = document.getElementById("logReason").value;
             let description = document.getElementById("logDescription").value;
+            let user = JSON.parse(localStorage.getItem("loggedUser"));
 
             if (!name || !reason || !description) {
                 alert("All fields are required!");
@@ -144,7 +150,7 @@
             }
 
             let logs = JSON.parse(localStorage.getItem("logs") || "[]");
-            logs.push({ name, reason, description, status: "unassigned", assignedTo: "", resolvedBy: "" });
+            logs.push({ name, reason, description, createdBy: user.username, position: user.position, status: "unassigned", assignedTo: "", resolvedBy: "" });
             localStorage.setItem("logs", JSON.stringify(logs));
 
             document.getElementById("logName").value = "";
@@ -165,6 +171,7 @@
                 logDiv.className = "log " + (log.status === "assigned" ? "assigned" : log.status === "resolved" ? "resolved" : "");
                 logDiv.innerHTML = `
                     <h3>${log.name}</h3>
+                    <p><strong>Created by:</strong> ${log.createdBy} - ${log.position}</p>
                     <p><strong>Reason:</strong> ${log.reason}</p>
                     <p><strong>Description:</strong> ${log.description}</p>
                     <p><strong>Status:</strong> ${log.status === "unassigned" ? "Awaiting Resolution" :
@@ -202,12 +209,14 @@
                 document.getElementById("dashboard").classList.remove("hidden");
                 document.getElementById("nav-bar").classList.remove("hidden");
                 document.getElementById("user-info").innerText = `${user.username} - ${user.position}`;
+                document.getElementById("logUser").innerText = user.username;
+                document.getElementById("logPosition").innerText = user.position;
                 loadLogs();
             }
         })();
     </script>
 
-    <!--Start of Tawk.to Script-->
+        <!--Start of Tawk.to Script-->
 <script type="text/javascript">
 var Tawk_API=Tawk_API||{}, Tawk_LoadStart=new Date();
 (function(){
@@ -220,6 +229,5 @@ s0.parentNode.insertBefore(s1,s0);
 })();
 </script>
 <!--End of Tawk.to Script-->
-    
 </body>
 </html>
